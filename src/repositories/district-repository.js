@@ -1,25 +1,27 @@
-import {CategoryModel} from "../models/category-model.js";
+import {DistrictModel} from "../models/district-model.js";
 
 let result;
 
-export const createCategory = async (category) => {
-    result = await CategoryModel.create(category);
+export const createDistrict = async (district) => {
+    result = await DistrictModel.create(district);
+
     return result;
 }
 
-export const getCategories = async () => {
-    result = await CategoryModel.find();
-    return result;
+export const getDistricts = async () => {
+    result = await DistrictModel.find();
+
+    return result
 }
 
-export const getTopCategoriesWitProfilesCount = async () => {
-    result = await CategoryModel.aggregate([
+export const getTopDistrictsWithProfileCount = async () => {
+    result = await DistrictModel.aggregate([
         {
 
             $lookup: {
                 from: "vendors",
                 localField: "title",
-                foreignField: "category",
+                foreignField: "district",
                 as: "vendors",
             }
         },
@@ -33,7 +35,6 @@ export const getTopCategoriesWitProfilesCount = async () => {
         {
             $project: {
                 vendors: 0,
-                services: 0,
             }
         },
         {

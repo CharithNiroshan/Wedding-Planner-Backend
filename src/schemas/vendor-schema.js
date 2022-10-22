@@ -37,5 +37,6 @@ export const VendorSchema = new mongoose.Schema({
         type: mongoose.SchemaTypes.String,
         required: true,
     },
+    gallery:[mongoose.SchemaTypes.String],
     services: [mongoose.SchemaTypes.String]
 });

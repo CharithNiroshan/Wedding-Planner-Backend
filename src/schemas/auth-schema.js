@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
 
 export const AuthSchema= new mongoose.Schema({
-    email:{
+    usrName:{
         type:mongoose.SchemaTypes.String,
         required:true,
     },
