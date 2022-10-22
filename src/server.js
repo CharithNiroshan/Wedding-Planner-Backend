@@ -1,5 +1,4 @@
 import express from "express";
-import {config} from "./config.js";
 import {connectDatabase} from "./connection/dbConnection.js";
 import {AuthRoute} from "./routes/auth-route.js";
 import {GuestRoute} from "./routes/guest-route.js";
@@ -11,6 +10,8 @@ import {AdminRoute} from "./routes/admin-route.js";
 
 const app = express();
 
+const port = process.env.PORT || 5000
+
 app.use(express.json());
 app.use(cors());
 app.use('/api/auth', AuthRoute);
@@ -21,8 +22,8 @@ app.use('/api/file', FileUploadRoute);
 app.use('/api/admin', AdminRoute);
 app.use(express.static("public"));
 
-connectDatabase(() => app.listen(config.SERVER_PORT, () => {
-    console.log(`Server is listening on port ${config.SERVER_PORT}`);
+connectDatabase(() => app.listen(port, () => {
+    console.log(`Server is listening on port ${port}`);
 }));
 
 
