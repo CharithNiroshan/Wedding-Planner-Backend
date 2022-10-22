@@ -1,28 +1,24 @@
 import mongoose from "mongoose";
 
-export const PackageSchema = new mongoose.Schema({
-    venId: {
+export const AdminSchema = new mongoose.Schema({
+    fullName: {
         type: mongoose.SchemaTypes.String,
         required: true,
     },
-    title: {
+    disName: {
         type: mongoose.SchemaTypes.String,
         required: true,
     },
-    des: {
+    prfImgUrl: {
         type: mongoose.SchemaTypes.String,
         required: true,
     },
-    imgUrl: {
+    email: {
         type: mongoose.SchemaTypes.String,
         required: true,
     },
-    includes:{
-        type:[mongoose.SchemaTypes.String],
-        required:true,
-    },
-    price: {
-        type: mongoose.SchemaTypes.Number,
+    cntNo: {
+        type: mongoose.SchemaTypes.String,
         required: true,
-    }
+    },
 });
