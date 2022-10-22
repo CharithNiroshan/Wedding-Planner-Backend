@@ -8,7 +8,8 @@
   "license": "ISC",
   "type": "module",
   "scripts": {
-    "start": "nodemon src/server.js"
+    "run": "nodemon src/server.js",
+    "start": "node src/server.js"
   },
   "dependencies": {
     "aws-sdk": "^2.1231.0",

@@ -1,5 +1,4 @@
 export const config={
-    SERVER_PORT:4000,
     MONGO_USERNAME:"rio",
     MONGO_PWD:"98039803",
     MONGO_CLUSTER:"weddingplannercluster",
