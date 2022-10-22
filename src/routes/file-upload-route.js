@@ -1,19 +1,26 @@
 import express from "express";
 import multer from "multer";
+import multerS3 from "multer-s3";
 import {
     getFileController,
     multipleFileUploadController,
     singleFileUploadController
 } from "../controllers/file-upload-controller.js";
+import {s3} from "../utils/s3.js";
+import {config} from "../config.js";
 
 export const FileUploadRoute = express.Router();
 
-const fileStorage = multer.diskStorage({
-    destination: function (req, file, cb) {
-        cb(null, "public");
+const bucketName = config.AWS_BUCKET_NAME;
+
+const fileStorage = multerS3({
+    s3:s3,
+    bucket:bucketName,
+    metadata: function (req, file, cb) {
+        cb(null, {fieldName: file.fieldname});
     },
-    filename: function (req, file, cb) {
-        cb(null, Date.now() + "-" + file.originalname);
+    key: function (req,file,cb){
+        cb(null, Date.now()+"-"+ file.originalname);
     },
 });
 
