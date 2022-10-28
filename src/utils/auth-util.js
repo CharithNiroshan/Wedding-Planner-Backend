@@ -1,9 +1,11 @@
 import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
 import crypto from "crypto";
+import dotenv from "dotenv";
+dotenv.config({path:"config.env"});
 
 export const getSignedToken = (id, type) => {
-    return jwt.sign({id: id, type: type}, config.JWT_SECRET, {expiresIn: config.JWT_EXPIRES_IN});
+    return jwt.sign({id: id, type: type}, process.env.JWT_SECRET, {expiresIn: process.env.JWT_EXPIRES_IN});
 }
 
 export const matchPasswords = async (password, password2) => {
