@@ -4,10 +4,10 @@ import {
     getAuth,
     getAuthByResetPasswordToken,
     updateAuth
-} from "../repositories/auth-repository.js";
-import {createAdmin, getAdmin} from "../repositories/admin-repository.js";
-import {createCustomer, getCustomer} from "../repositories/customer-repository.js";
-import {createVendor, getVendorProfile} from "../repositories/vendor-repository.js";
+} from "../database/repositories/auth-repository.js";
+import {createAdmin, getAdmin} from "../database/repositories/admin-repository.js";
+import {createCustomer, getCustomer} from "../database/repositories/customer-repository.js";
+import {createVendor, getVendorProfile} from "../database/repositories/vendor-repository.js";
 import {getHashedPassword, getPasswordResetToken, getSignedToken, matchPasswords} from "../utils/auth-util.js";
 import crypto from "crypto";
 import {sentMail} from "../utils/sent-mail.js";

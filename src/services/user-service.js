@@ -1,6 +1,6 @@
-import {checkForEligibilityToReview, createReview} from "../repositories/review-repository.js";
-import {createBooking, getBooking, getBookings} from "../repositories/booking-repository.js";
-import {updateCustomer} from "../repositories/customer-repository.js";
+import {checkForEligibilityToReview, createReview} from "../database/repositories/review-repository.js";
+import {createBooking, getBooking, getBookings} from "../database/repositories/booking-repository.js";
+import {updateCustomer} from "../database/repositories/customer-repository.js";
 
 export const addReviewService = async (req) => {
     const {usrId, venId, rating, ratingDes} = req.body;
@@ -96,9 +96,6 @@ export const getBookingsService = async (req) => {
     let types;
 
     switch (type) {
-        case "All":
-            types = [0, 1, 2];
-            break;
         case "Accepted":
             types = [1];
             break;
@@ -109,6 +106,7 @@ export const getBookingsService = async (req) => {
             types = [2];
             break;
         default:
+            types = [0, 1, 2];
             break;
     }
 

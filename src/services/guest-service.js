@@ -1,6 +1,6 @@
-import {getTopRatedVendors, getVendor, searchVendors} from "../repositories/vendor-repository.js";
-import {getCategories, getTopCategoriesWitProfilesCount} from "../repositories/category-repository.js";
-import {getDistricts, getTopDistrictsWithProfileCount} from "../repositories/district-repository.js";
+import {getTopRatedVendors, getVendor, searchVendors} from "../database/repositories/vendor-repository.js";
+import {getCategories, getTopCategoriesWitProfilesCount} from "../database/repositories/category-repository.js";
+import {getDistricts, getTopDistrictsWithProfileCount} from "../database/repositories/district-repository.js";
 
 export const getHomeDetailsService = async () => {
     const businessProfiles = await getTopRatedVendors();
@@ -21,10 +21,20 @@ export const getVendorProfileService = async (req) => {
     const id = req.params.id;
     const vendorProfile = await getVendor(id);
 
-    return ({
-        success: true,
-        data: vendorProfile,
-    })
+    if(vendorProfile){
+        return ({
+            success: true,
+            data: vendorProfile,
+        })
+    }
+    else {
+        return ({
+            success:false,
+            data:{
+                message:"Could not find the business profile you are looking for"
+            }
+        })
+    }
 }
 
 export const searchVendorProfilesService = async (req) => {
