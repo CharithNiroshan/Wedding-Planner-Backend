@@ -1,38 +1,17 @@
-import {config} from "../config.js";
 import S3 from "aws-sdk/clients/s3.js";
+import dotenv from "dotenv";
+dotenv.config({path:"config.env"});
 
-const bucketName = config.AWS_BUCKET_NAME;
-const region = config.AWS_BUCKET_REGION;
-const accessKeyId = config.AWS_ACCESS_KEY;
-const secretAccessKey = config.AWS_SECRET_KEY;
+const bucketName = process.env.AWS_BUCKET_NAME;
+const region = process.env.AWS_BUCKET_REGION;
+const accessKeyId = process.env.AWS_ACCESS_KEY;
+const secretAccessKey = process.env.AWS_SECRET_KEY;
 
 export const s3 = new S3({
     region,
     accessKeyId,
     secretAccessKey,
 })
-
-// export const uploadFile = (file) => {
-//     const fileStream = fs.createReadStream(file.path);
-//
-//     const uploadParams = {
-//         Bucket: bucketName,
-//         Body: fileStream,
-//         Key: file.filename
-//     }
-//
-//     return s3.upload(uploadParams).promise();
-// }
-//
-// export const uploadFiles = (files) => {
-//     const promises = [];
-//
-//     files.map(async (file) => {
-//         promises.push(await uploadFile(file));
-//     })
-//
-//     return promises;
-// }
 
 export const readFile = (fileKey) => {
     const downloadParams = {

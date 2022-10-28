@@ -7,11 +7,12 @@ import {
     singleFileUploadController
 } from "../controllers/file-upload-controller.js";
 import {s3} from "../utils/s3.js";
-import {config} from "../config.js";
+import dotenv from "dotenv";
+dotenv.config({path:"config.env"});
 
 export const FileUploadRoute = express.Router();
 
-const bucketName = config.AWS_BUCKET_NAME;
+const bucketName = process.env.AWS_BUCKET_NAME;
 
 const fileStorage = multerS3({
     s3:s3,

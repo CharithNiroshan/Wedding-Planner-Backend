@@ -1,13 +1,15 @@
 import express from "express";
-import {connectDatabase} from "./connection/dbConnection.js";
+import dotenv from "dotenv";
+import cors from "cors";
+import {connectDatabase} from "./database/dbConnection.js";
 import {AuthRoute} from "./routes/auth-route.js";
 import {GuestRoute} from "./routes/guest-route.js";
 import {UserRoute} from "./routes/user-route.js";
 import {VendorRoute} from "./routes/vendor-route.js";
-import cors from "cors";
 import {FileUploadRoute} from "./routes/file-upload-route.js";
 import {AdminRoute} from "./routes/admin-route.js";
 
+dotenv.config({path:"config.env"});
 const app = express();
 
 const port = process.env.PORT || 5000

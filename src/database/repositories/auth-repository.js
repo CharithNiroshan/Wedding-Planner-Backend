@@ -1,5 +1,4 @@
 import {AuthModel} from "../models/auth-model.js";
-import {CustomerModel} from "../models/customer-model.js";
 
 let result;
 

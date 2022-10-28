@@ -1,5 +1,5 @@
-import {createCategory} from "../repositories/category-repository.js";
-import {createDistrict} from "../repositories/district-repository.js";
+import {createCategory} from "../database/repositories/category-repository.js";
+import {createDistrict} from "../database/repositories/district-repository.js";
 
 export const addCategoryService = async (req) => {
     const {title, imgUrl, services} = req.body;

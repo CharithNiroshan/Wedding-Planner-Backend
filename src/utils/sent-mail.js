@@ -1,16 +1,17 @@
 import mg from "mailgun-js";
-import {config} from "../config.js";
+import dotenv from "dotenv";
+dotenv.config({path:"config.env"});
 
 const mailgun = mg({
-    apiKey: config.MAILGUN_API_KEY,
-    domain: config.MAILGUN_DOMAIN
+    apiKey: process.env.MAILGUN_API_KEY,
+    domain: process.env.MAILGUN_DOMAIN
 })
 
 export const sentMail = async (options) => {
     const {to, subject, html} = options;
 
     const mailOptions = {
-        from: `MyWeddingPlanner.lk <${config.EMAIL_FROM}>`,
+        from: `MyWeddingPlanner.lk <${process.env.EMAIL_FROM}>`,
         to: to,
         subject: subject,
         html: html,
