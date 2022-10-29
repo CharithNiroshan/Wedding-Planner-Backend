@@ -20,19 +20,18 @@ export const addReviewService = async (req) => {
 
         const result = await createReview(review);
 
-        return {
-            success: true,
-            data: {
-                message: "Review Added Successfully",
-                result: result
+        if (result) {
+            return {
+                success: true,
+                data: {
+                    message: "Review Added Successfully"
+                }
             }
         }
     } else {
-        return {
-            success: false,
-            data: {
-                message: "Sorry. You can't add more than one review with the same vendor.",
-            }
+        throw {
+            statuscode: 400,
+            message: "Sorry. You can't add more than one review with the same vendor.",
         }
     }
 }
@@ -68,11 +67,12 @@ export const addBookingService = async (req) => {
 
     const result = await createBooking(booking);
 
-    return {
-        success: true,
-        data: {
-            message: "Booking added Successfully.",
-            booking: result,
+    if (result) {
+        return {
+            success: true,
+            data: {
+                message: "Booking added Successfully.",
+            }
         }
     }
 }
@@ -82,12 +82,21 @@ export const getBookingService = async (req) => {
 
     const result = await getBooking(bookingId);
 
-    return ({
-        success: true,
-        data: {
-            booking: result,
+    if (result) {
+        return ({
+            success: true,
+            data: {
+                booking: result,
+            }
+        })
+    } else {
+        throw {
+            statuscode: 404,
+            message: "Booking not Found"
         }
-    })
+    }
+
+
 }
 
 export const getBookingsService = async (req) => {
@@ -126,11 +135,13 @@ export const updateUserProfileService = async (req) => {
 
     const result = await updateCustomer(usrId, updates);
 
-    return {
-        success: true,
-        data: {
-            message: "Profile Updated Successfully.",
-            user: result?.value,
+    if (result.lastErrorObject.updatedExisting) {
+        return {
+            success: true,
+            data: {
+                message: "Profile Updated Successfully.",
+                user: result?.value,
+            }
         }
     }
 }

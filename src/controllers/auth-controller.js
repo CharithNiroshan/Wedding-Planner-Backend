@@ -5,42 +5,42 @@ import {
     signInService
 } from "../services/auth-service.js";
 
-export const checkForUsernameController = async (req, res) => {
+export const checkForUsernameController = async (req, res, next) => {
     try {
         res.status(200).json(await checkForUsernameService(req));
     } catch (err) {
-        res.status(404).json({error: err.message});
+        next(err);
     }
 }
 
-export const registerController = async (req, res) => {
+export const registerController = async (req, res, next) => {
     try {
         res.status(200).json(await registerService(req));
     } catch (err) {
-        res.status(404).json({error: err.message});
+        next(err)
     }
 }
 
-export const signInController = async (req, res) => {
+export const signInController = async (req, res, next) => {
     try {
         res.status(200).json(await signInService(req));
     } catch (err) {
-        res.status(404).json({error: err.message});
+        next(err)
     }
 }
 
-export const getPasswordResetTokenController = async (req, res) => {
+export const getPasswordResetTokenController = async (req, res, next) => {
     try {
         res.status(200).json(await forgetPasswordService(req));
     } catch (err) {
-        res.status(404).json({error: err.message});
+        next(err);
     }
 }
 
-export const resetPasswordController = async (req, res) => {
+export const resetPasswordController = async (req, res, next) => {
     try {
         res.status(200).json(await resetPasswordService(req));
     } catch (err) {
-        res.status(500).json({error: err.message});
+        next(err);
     }
 }

@@ -1,6 +1,42 @@
 import {createPackage, deletePackage, getPackages, updatePackage} from "../database/repositories/package-repository.js";
 import {updateVendor} from "../database/repositories/vendor-repository.js";
-import {getBookingRequest, getBookingRequests, updateBookingRequest} from "../database/repositories/booking-repository.js";
+import {
+    getBookingRequest,
+    getBookingRequests, getAppointmentsForPeriod,
+    updateBookingRequest, getCount
+} from "../database/repositories/booking-repository.js";
+
+export const getVendorHomeDetailsService = async (req) => {
+    const {venId} = req.params;
+
+    const todayStartTime = new Date();
+    todayStartTime.setHours(0, 0, 0, 0);
+    const todayEndTime = new Date();
+    todayEndTime.setHours(23, 59, 59, 9999);
+
+    const weeklyStart = new Date();
+    weeklyStart.setHours(0,0,0,0);
+    const weeklyEnd = new Date();
+    weeklyEnd.setDate(weeklyStart.getDate() + 7)
+    weeklyEnd.setHours(23,59,59,9999);
+
+    const todayAppointments = await getAppointmentsForPeriod(venId, todayStartTime, todayEndTime);
+    const weeklyAppointments = await getAppointmentsForPeriod(venId, weeklyStart, weeklyEnd);
+    const appointmentCount = await getCount(venId, 1);
+    const bookingRequestCount = await getCount(venId, 0);
+
+    return {
+        success: true,
+        data: {
+            stats: {
+                appointmentCount: appointmentCount,
+                bookingRequestCount: bookingRequestCount
+            },
+            todayAppointments: todayAppointments,
+            weeklyAppointments: weeklyAppointments
+        }
+    }
+}
 
 export const updateVendorProfileService = async (req) => {
     const {venId} = req.params;
@@ -8,11 +44,13 @@ export const updateVendorProfileService = async (req) => {
 
     const result = await updateVendor(venId, updates);
 
-    return {
-        success: true,
-        data: {
-            message: "Profile Updated Successfully.",
-            user: result?.value,
+    if (result.lastErrorObject.updatedExisting) {
+        return {
+            success: true,
+            data: {
+                message: "Profile Updated Successfully.",
+                user: result?.value,
+            }
         }
     }
 }
@@ -31,13 +69,15 @@ export const addPackageService = async (req) => {
 
     const result = await createPackage(pack);
 
-    return ({
-        success: true,
-        data: {
-            message: "Package Added Successfully",
-            package: result
-        }
-    })
+    if (result) {
+        return ({
+            success: true,
+            data: {
+                message: "Package Added Successfully",
+                package: result
+            }
+        })
+    }
 }
 
 export const updatePackageService = async (req) => {
@@ -46,34 +86,41 @@ export const updatePackageService = async (req) => {
 
     const result = await updatePackage(id, updates);
 
-    return ({
-        success: true,
-        data: {
-            message: "Package Updated Successfully",
-            package: result
-        }
-    })
+    if (result.lastErrorObject.updatedExisting) {
+        return ({
+            success: true,
+            data: {
+                message: "Package Updated Successfully",
+                package: result
+            }
+        })
+    }
 }
 
 export const deletePackageService = async (req) => {
     const {id} = req.params;
 
-    await deletePackage(id);
+    const result = await deletePackage(id);
 
-    return ({
-        success: true,
-        data: {
-            message: "Package Deleted Successfully"
+    if (result) {
+        return ({
+            success: true,
+            data: {
+                message: "Package Deleted Successfully"
+            }
+        })
+    } else {
+        throw {
+            statuscode: 404,
+            message: "Package could not be found."
         }
-    })
+    }
 }
 
 export const getPackagesService = async (req) => {
     const {venId} = req.params;
 
     const packages = await getPackages(venId);
-
-    console.log(venId);
 
     return ({
         success: true,
@@ -101,12 +148,19 @@ export const getBookingRequestService = async (req) => {
 
     let bookingRequest = await getBookingRequest(bookingRequestId);
 
-    return ({
-        success: true,
-        data: {
-            bookingRequest: bookingRequest
+    if (bookingRequest) {
+        return ({
+            success: true,
+            data: {
+                bookingRequest: bookingRequest
+            }
+        })
+    } else {
+        throw {
+            statuscode: 404,
+            message: "Booking request could not be found."
         }
-    })
+    }
 }
 
 export const getAppointmentsService = async (req) => {
@@ -125,14 +179,22 @@ export const getAppointmentsService = async (req) => {
 export const getAppointmentService = async (req) => {
     const {appointmentId} = req.params;
 
-    let appointments = await getBookingRequest(appointmentId);
+    let appointment = await getBookingRequest(appointmentId);
 
-    return ({
-        success: true,
-        data: {
-            appointments: appointments
+    if (appointment) {
+        return ({
+            success: true,
+            data: {
+                appointment: appointment
+            }
+        })
+    } else {
+        throw {
+            statuscode: 404,
+            message: "Appointment could not be found."
         }
-    })
+    }
+
 }
 
 export const approveBookingRequestService = async (req) => {
@@ -152,28 +214,22 @@ export const approveBookingRequestService = async (req) => {
             }
         })
     } else {
-        return ({
-            success: true,
-            data: {
-                message: "Approving Failed. Try Again."
-            }
-        })
+        throw {
+            statuscode: 404,
+            message: "Approving Failed. Please try again."
+        }
     }
-
-
 }
 
 export const rejectBookingRequestService = async (req) => {
     const {bookingRequestId} = req.params;
     const {message} = req.body;
 
-    if(message === undefined){
-        return ({
-            success: false,
-            data: {
-                message: "Reject message is required."
-            }
-        })
+    if (message === undefined) {
+        throw {
+            statuscode: 400,
+            message: "Reject message is required."
+        }
     }
 
     const updates = {
@@ -191,13 +247,9 @@ export const rejectBookingRequestService = async (req) => {
             }
         })
     } else {
-        return ({
-            success: true,
-            data: {
-                message: "Approving Failed. Try Again."
-            }
-        })
+        throw {
+            statuscode: 404,
+            message: "Approving Failed. Try Again."
+        }
     }
-
-
 }

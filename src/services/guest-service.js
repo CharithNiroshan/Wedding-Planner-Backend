@@ -28,12 +28,10 @@ export const getVendorProfileService = async (req) => {
         })
     }
     else {
-        return ({
-            success:false,
-            data:{
-                message:"Could not find the business profile you are looking for"
-            }
-        })
+        throw {
+            statuscode:404,
+            message:"Business profile could not be found."
+        }
     }
 }
 

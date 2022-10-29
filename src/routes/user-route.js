@@ -6,11 +6,13 @@ import {
     getBookingController,
     updateProfileController
 } from "../controllers/user-controller.js";
+import {authMiddleware} from "../middlewares/auth-middleware.js";
+import {isCustomerMiddleware} from "../middlewares/is-customer-middleware.js";
 
-export const UserRoute=express.Router();
+export const UserRoute = express.Router();
 
-UserRoute.post("/add-review",addReviewController);
-UserRoute.post("/add-booking",addBookingController);
-UserRoute.get("/get-booking/:bookingId",getBookingController);
-UserRoute.get("/get-bookings/:type/:usrId",getBookingsController);
-UserRoute.put("/update-profile/:usrId",updateProfileController);
+UserRoute.post("/add-review", [authMiddleware, isCustomerMiddleware], addReviewController);
+UserRoute.post("/add-booking", [authMiddleware, isCustomerMiddleware], addBookingController);
+UserRoute.get("/get-booking/:bookingId", [authMiddleware, isCustomerMiddleware], getBookingController);
+UserRoute.get("/get-bookings/:type/:usrId", [authMiddleware, isCustomerMiddleware], getBookingsController);
+UserRoute.put("/update-profile/:usrId", [authMiddleware, isCustomerMiddleware], updateProfileController);

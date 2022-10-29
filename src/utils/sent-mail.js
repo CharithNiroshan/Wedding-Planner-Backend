@@ -1,6 +1,7 @@
 import mg from "mailgun-js";
 import dotenv from "dotenv";
-dotenv.config({path:"config.env"});
+
+dotenv.config({path: "config.env"});
 
 const mailgun = mg({
     apiKey: process.env.MAILGUN_API_KEY,
@@ -17,10 +18,6 @@ export const sentMail = async (options) => {
         html: html,
     }
 
-    await mailgun.messages().send(mailOptions, (error) => {
-        if (error) {
-            throw error;
-        }
-    })
+    return await mailgun.messages().send(mailOptions);
 }
 

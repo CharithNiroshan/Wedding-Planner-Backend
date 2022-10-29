@@ -7,7 +7,7 @@ import {
 } from "../database/repositories/auth-repository.js";
 import {createAdmin, getAdmin} from "../database/repositories/admin-repository.js";
 import {createCustomer, getCustomer} from "../database/repositories/customer-repository.js";
-import {createVendor, getVendorProfile} from "../database/repositories/vendor-repository.js";
+import {createVendor, getVendor} from "../database/repositories/vendor-repository.js";
 import {getHashedPassword, getPasswordResetToken, getSignedToken, matchPasswords} from "../utils/auth-util.js";
 import crypto from "crypto";
 import {sentMail} from "../utils/sent-mail.js";
@@ -16,15 +16,28 @@ export const checkForUsernameService = async (req) => {
     const {usrName} = req.body;
 
     if (!usrName) {
-        return {success: false, message: "Username is required"}
+        throw {
+            statuscode: 400,
+            message: "Username is required"
+        };
     }
 
     const auth = await checkIfUsernameExists(usrName);
 
     if (auth) {
-        return {isExists: true};
+        return {
+            success: true,
+            data: {
+                isExists: true
+            }
+        }
     } else {
-        return {isExists: false};
+        return {
+            success: true,
+            data: {
+                isExists: false
+            }
+        }
     }
 }
 
@@ -33,8 +46,7 @@ export const registerService = async (req) => {
 
     let createdUser, createdAuth;
 
-
-    switch (auth.type) {
+    switch (auth?.type) {
         case '0':
             createdUser = await createCustomer(user);
             break;
@@ -45,7 +57,10 @@ export const registerService = async (req) => {
             createdUser = await createAdmin(user);
             break;
         default:
-            break;
+            throw {
+                statuscode: 400,
+                message: "User type not available"
+            }
     }
 
     const hashedPassword = await getHashedPassword(auth.pwd);
@@ -60,14 +75,19 @@ export const registerService = async (req) => {
 export const signInService = async (req) => {
     const {usrName, pwd} = req.body;
 
+    if (!usrName || !pwd) {
+        throw {
+            statuscode: 400,
+            message: "Username and Password required"
+        }
+    }
+
     const auth = await getAuth(usrName);
 
     if (!auth) {
-        return {
-            success: false,
-            data: {
-                message: "Username could not be Found",
-            }
+        throw {
+            statuscode: 401,
+            message: "Username could not be found."
         }
     }
 
@@ -82,7 +102,7 @@ export const signInService = async (req) => {
                 user = await getCustomer(auth.usrId);
                 break;
             case 1:
-                user = await getVendorProfile(auth.usrId);
+                user = await getVendor(auth.usrId);
                 break;
             case 2:
                 user = await getAdmin(auth.usrId);
@@ -100,11 +120,9 @@ export const signInService = async (req) => {
             }
         }
     } else {
-        return {
-            success: false,
-            data: {
-                message: "Invalid Password",
-            }
+        throw {
+            statuscode: 401,
+            message: "Invalid password."
         }
     }
 }
@@ -112,14 +130,19 @@ export const signInService = async (req) => {
 export const forgetPasswordService = async (req) => {
     const {usrName} = req.body;
 
+    if (!usrName) {
+        throw {
+            statuscode: 400,
+            message: "Username is required."
+        }
+    }
+
     const auth = await getAuth(usrName);
 
     if (!auth) {
-        return {
-            success: false,
-            data: {
-                message: "Username could not be found."
-            }
+        throw {
+            statuscode: 401,
+            message: "Invalid Username."
         }
     }
 
@@ -132,9 +155,23 @@ export const forgetPasswordService = async (req) => {
 
     const result = await updateAuth(updates, auth._id);
 
-    const customer = await getCustomer(auth.usrId);
+    let customer;
 
-    if (result.ok) {
+    switch (auth.type) {
+        case 0:
+            customer = await getCustomer(auth.usrId);
+            break;
+        case 1:
+            customer = await getVendor(auth.usrId);
+            break;
+        case 2:
+            customer = await getAdmin(auth.usrId);
+            break;
+        default:
+            break
+    }
+
+    if (result.lastErrorObject.updatedExisting) {
         const resetPasswordUrl = `http://localhost:3000/auth/reset-password/${resetToken}`;
 
         const mailOptions = {
@@ -147,29 +184,18 @@ export const forgetPasswordService = async (req) => {
             `
         }
 
-        try {
-            await sentMail(mailOptions);
+        await sentMail(mailOptions);
 
-            return {
-                success: true,
-                data: {
-                    message: `Mail has been sent successfully to ${customer.email}. Check your inbox.`,
-                }
-            }
-        } catch (err) {
-            return {
-                success: false,
-                data: {
-                    message: `Something went wrong with sending the mail. ${err.message}`,
-                }
+        return {
+            success: true,
+            data: {
+                message: `Mail has been sent successfully to ${customer.email}. Check your inbox.`,
             }
         }
     } else {
-        return {
-            success: false,
-            data: {
-                message: "Something went wrong. Please try again."
-            }
+        throw {
+            statuscode: 404,
+            message: "Updating database failed."
         }
     }
 }
@@ -178,16 +204,21 @@ export const resetPasswordService = async (req) => {
     const {pwd} = req.body;
     const {resetToken} = req.params;
 
+    if(!pwd){
+        throw {
+            statuscode:400,
+            message:"New password is required"
+        }
+    }
+
     const resetPasswordToken = crypto.createHash("sha256").update(resetToken).digest("hex");
 
     const auth = await getAuthByResetPasswordToken(resetPasswordToken);
 
     if (!auth) {
-        return {
-            success: false,
-            data: {
-                message: "Password reset token is not valid",
-            }
+        throw {
+            statuscode:401,
+            message:"Password reset token is not valid"
         }
     }
 
@@ -206,13 +237,6 @@ export const resetPasswordService = async (req) => {
             success: true,
             data: {
                 message: "Password has been reset successfully. Login to continue."
-            }
-        }
-    } else {
-        return {
-            success: false,
-            data: {
-                message: "Could not update the password. Please try again."
             }
         }
     }

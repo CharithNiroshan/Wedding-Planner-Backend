@@ -6,42 +6,42 @@ import {
     searchVendorProfilesService
 } from "../services/guest-service.js";
 
-export const getHomeDetailsController = async (req, res) => {
+export const getHomeDetailsController = async (req, res, next) => {
     try {
         res.status(200).json(await getHomeDetailsService());
     } catch (err) {
-        res.status(500).json({error: err.message});
+        next(err);
     }
 }
 
-export const getVendorProfileController = async (req, res) => {
+export const getVendorProfileController = async (req, res, next) => {
     try {
         res.status(200).json(await getVendorProfileService(req));
     } catch (err) {
-        res.status(500).json({error: err.message});
+        next(err);
     }
 }
 
-export const searchVendorProfilesController = async (req, res) => {
+export const searchVendorProfilesController = async (req, res, next) => {
     try {
         res.status(200).json(await searchVendorProfilesService(req));
     } catch (err) {
-        res.status(500).json({error: err.message});
+        next(err);
     }
 }
 
-export const getCategoriesController = async (req,res)=>{
+export const getCategoriesController = async (req, res, next) => {
     try {
         res.status(200).json(await getCategoriesService());
     } catch (err) {
-        res.status(500).json({error: err.message});
+        next(err);
     }
 }
 
-export const getDistrictsController = async (req,res)=>{
+export const getDistrictsController = async (req, res, next) => {
     try {
         res.status(200).json(await getDistrictsService());
     } catch (err) {
-        res.status(500).json({error: err.message});
+        next(err);
     }
 }

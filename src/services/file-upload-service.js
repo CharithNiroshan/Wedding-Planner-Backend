@@ -8,10 +8,10 @@ export const singleFileUploadService = async (req) => {
             imgUrl: `https://my-wedding-planner-lk.herokuapp.com/api/file/uploads/images/${req.key}`
         })
     } else {
-        return ({
-            success: false,
-            message: "File uploading failed."
-        })
+        throw {
+            statuscode:404,
+            message:"File Uploading Failed."
+        }
     }
 }
 
@@ -24,10 +24,10 @@ export const multipleFileUploadService = async (req) => {
             imgUrlArray: fileArray
         })
     } else {
-        return ({
-            success: false,
-            message: "Files uploading failed."
-        })
+        throw {
+            statuscode:404,
+            message:"Files Uploading Failed."
+        }
     }
 }
 
@@ -39,6 +39,5 @@ export const getFileService = (req) => {
     } catch (err) {
         throw err;
     }
-
 }
 

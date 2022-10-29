@@ -12,7 +12,10 @@ export const getBookings = async (usrId, types) => {
         {
             $match: {
                 usrId: usrId,
-                status: {$in: types}
+                status: {$in: types},
+                date: {
+                    $gt: new Date()
+                }
             }
         },
         {
@@ -45,6 +48,11 @@ export const getBookings = async (usrId, types) => {
             $set: {
                 vendor: {$arrayElemAt: ["$vendor", 0]},
                 package: {$arrayElemAt: ["$package", 0]},
+            }
+        },
+        {
+            $sort: {
+                date: 1
             }
         },
         {
@@ -120,7 +128,10 @@ export const getBookingRequests = async (venId, status) => {
         {
             $match: {
                 venId: venId,
-                status: status
+                status: status,
+                date: {
+                    $gt: new Date()
+                }
             }
         },
         {
@@ -153,6 +164,11 @@ export const getBookingRequests = async (venId, status) => {
             $set: {
                 user: {$arrayElemAt: ["$user", 0]},
                 package: {$arrayElemAt: ["$package", 0]},
+            }
+        },
+        {
+            $sort: {
+                date: 1
             }
         },
         {
@@ -233,5 +249,76 @@ export const updateBookingRequest = async (bookingRequestId, updates) => {
             new: true, rawResult: true
         }
     )
+    return result;
+}
+
+export const getAppointmentsForPeriod = async (venId, start, end) => {
+    result = await BookingModel.aggregate([
+        {
+            $match: {
+                venId: venId,
+                status: 1,
+                date: {
+                    $gt: start,
+                    $lt: end
+                }
+            }
+        },
+        {
+            $addFields: {
+                usrId: {
+                    $toObjectId: "$usrId"
+                },
+                packageId: {
+                    $toObjectId: "$packageId"
+                }
+            }
+        },
+        {
+            $lookup: {
+                from: "customers",
+                localField: "usrId",
+                foreignField: "_id",
+                as: "user",
+            }
+        },
+        {
+            $lookup: {
+                from: "packages",
+                localField: "packageId",
+                foreignField: "_id",
+                as: "package",
+            }
+        },
+        {
+            $set: {
+                user: {$arrayElemAt: ["$user", 0]},
+                package: {$arrayElemAt: ["$package", 0]},
+            }
+        },
+        {
+            $sort: {
+                date: 1
+            }
+        },
+        {
+            $project: {
+                usrId: 0,
+                venId: 0,
+                packageId: 0
+            }
+        }
+    ])
+    return result;
+}
+
+export const getCount = async (venId, status) => {
+    result = await BookingModel.count({
+        venId: venId,
+        status: status,
+        date: {
+            $gt: new Date()
+        }
+    });
     return result;
 }

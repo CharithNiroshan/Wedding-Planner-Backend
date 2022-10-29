@@ -17,6 +17,11 @@ export const getAuth = async (usrName) => {
     return result;
 }
 
+export const getAuthById = async (id) => {
+    result = await AuthModel.findById(id);
+    return result;
+}
+
 export const updateAuth = async (updates, id) => {
     result = await AuthModel.findByIdAndUpdate(
         id,
@@ -26,10 +31,10 @@ export const updateAuth = async (updates, id) => {
     return result;
 }
 
-export const getAuthByResetPasswordToken = async (resetPasswordToken) =>{
+export const getAuthByResetPasswordToken = async (resetPasswordToken) => {
     result = await AuthModel.findOne({
-        resetPasswordToken:resetPasswordToken,
-        resetPasswordTokenExpire: { $gt: Date.now() },
+        resetPasswordToken: resetPasswordToken,
+        resetPasswordTokenExpire: {$gt: Date.now()},
     });
     return result;
 }

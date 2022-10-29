@@ -1,26 +1,26 @@
 import {getFileService, multipleFileUploadService, singleFileUploadService} from "../services/file-upload-service.js";
 
-export const singleFileUploadController = async (req, res) => {
+export const singleFileUploadController = async (req, res, next) => {
     try {
         res.status(200).json(await singleFileUploadService(req.file));
     } catch (err) {
-        res.status(500).json({error: err.message});
+        next(err)
     }
 }
 
-export const multipleFileUploadController = async (req, res) => {
+export const multipleFileUploadController = async (req, res, next) => {
     try {
         res.status(200).json(await multipleFileUploadService(req.files));
     } catch (err) {
-        res.status(500).json({error: err.message});
+        next(err);
     }
 }
 
-export const getFileController = async (req, res) => {
+export const getFileController = async (req, res, next) => {
     try {
         const fileStream = getFileService(req);
         fileStream.pipe(res);
     } catch (err) {
-        res.status(500).json({error: err.message});
+        next(err);
     }
 }
